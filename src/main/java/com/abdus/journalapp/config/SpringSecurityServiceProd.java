@@ -18,10 +18,9 @@ import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity
-@Profile("dev")
-// Optional: allows use of @PreAuthorize, etc.
-public class SpringSecurityService {
+@EnableMethodSecurity// Optional: allows use of @PreAuthorize, etc.
+@Profile("prod")
+public class SpringSecurityServiceProd {
 
     @Autowired
     private UserDetailServiceImp userDetailsService;
@@ -31,11 +30,7 @@ public class SpringSecurityService {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
                 .authorizeHttpRequests(req -> req
-                        .requestMatchers("/public/**").permitAll()
-                        .requestMatchers("/journal/**","/user/**").authenticated()
-                        .requestMatchers("/admin/**").hasRole("ADMIN")
-//                        .anyRequest().authenticated())
-                        .anyRequest().permitAll())
+                        .anyRequest().authenticated())
                 .httpBasic(Customizer.withDefaults())  // Use HTTP Basic Auth
                 .csrf(AbstractHttpConfigurer::disable) // Disable CSRF for APIs
                 .build();

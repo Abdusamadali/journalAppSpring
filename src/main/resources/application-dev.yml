@@ -1,0 +1,18 @@
+#
+##mongodb://127.0.0.1:27017
+#
+spring:
+  data:
+   mongodb:
+    uri: mongodb+srv://abdusamadali05:I0mROJHxK3qBNbVV@cluster0.vshupy8.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
+    database: journalDb
+    auto-index-creation: true
+  #spring.data.mongodb.username=username
+  #spring.data.mongodb.password= password
+mongodb:
+    //127.0.0.1:27017
+#
+server:
+  port: 8080
+#  servlet:
+###    context-path: /journal
