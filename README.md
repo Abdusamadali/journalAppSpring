@@ -50,3 +50,9 @@ Spring Security Filter Chain
     v
     Client receives JSON (or 204 if no content)
 
+----------------------
+Client → Tomcat → Spring Security Filter Chain
+→ AuthenticationManager authenticates user (via Basic Auth)
+→ SecurityContext is populated with Authentication object
+→ DispatcherServlet → UserController.getAllUsers()
+→ SecurityContextHolder.getContext().getAuthentication() returns auth object

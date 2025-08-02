@@ -6,6 +6,8 @@ import com.abdus.journalapp.entity.User;
 import com.abdus.journalapp.repository.JournalEntryRepository;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,8 +25,10 @@ public class JournalEntryService {
     private UserService userService;
 
     @Transactional
-    public  void saveJournalEntry(JournalEntry myEntry, String userName)  {
+    public  void saveJournalEntry(JournalEntry myEntry)  {
         try {
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            String userName = auth.getName();
             User user = userService.findUserName(userName);
             JournalEntry saved = journalEntryRepository.save(myEntry);
             user.getJournalEntries().add(saved);
@@ -35,9 +39,9 @@ public class JournalEntryService {
         }
     }
 
-    public  void saveJournalEntry(JournalEntry myEntry){
-     journalEntryRepository.save(myEntry);
-    }
+//    public  void saveJournalEntry(JournalEntry myEntry){
+//     journalEntryRepository.save(myEntry);
+//    }
 
 
     public List<JournalEntry>getAlldata(){
@@ -46,21 +50,27 @@ public class JournalEntryService {
        return JournalEntryList;
     }
 
+
     public Optional<JournalEntry> getJournalEntryById(ObjectId id){
 //        JournalEntry journalEntry=journalEntryRepository.findById(id).get();
 //       return   journalEntry;
         return journalEntryRepository.findById(id);
     }
 
-    public void deleteById(ObjectId id, String userName){
-        User user = userService.findUserName(userName);
-        user.getJournalEntries().removeIf(journalEntry -> journalEntry.getId().equals(id));
-        userService.saveUser(user);
-        journalEntryRepository.deleteById(id);
+    public boolean deleteById(ObjectId id){
+
+        boolean removed =false;
+        User user = userService.findUserName(SecurityContextHolder.getContext().getAuthentication().getName());
+        removed =  user.getJournalEntries().removeIf(journalEntry -> journalEntry.getId().equals(id));
+        if(removed){
+            userService.saveUser(user);
+            journalEntryRepository.deleteById(id);
+        }
+       return removed;
     }
-    public void deleteById(ObjectId id){
-        journalEntryRepository.deleteById(id);
-    }
+//    public void deleteById(ObjectId id){
+//        journalEntryRepository.deleteById(id);
+//    }
 
 }
 //----->mongo function interaction with database ---journal database

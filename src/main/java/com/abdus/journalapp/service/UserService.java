@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Component
 public class UserService {
@@ -23,13 +24,28 @@ public class UserService {
 
     private static final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
-    public  void saveUser(User user){
+    public void saveUser(User user){
         userRepository.save(user);
     }
 
+
+    //only admin role is allotted
+    public  void saveOnlyAdmin(User user){
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setRoles(Arrays.asList("ADMIN"));
+        userRepository.save(user);
+    }
+
+    //create admin with user  role
+    public void saveAdmin(User user){
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setRoles(Arrays.asList("ADMIN","USER"));
+    }
+
+    //only user role is allotted
     public void saveNewUser(User user){
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        user.setRoles(Arrays.asList("User"));
+        user.setRoles(Arrays.asList("USER"));
         userRepository.save(user);
     }
 
@@ -37,6 +53,12 @@ public class UserService {
        List<User> UsersList=new ArrayList<>();
         UsersList.addAll(userRepository.findAll());
        return UsersList;
+    }
+
+    public List<User>getAdmins(){
+      return userRepository.findAll().stream()
+              .filter(x->x.getRoles().contains("Admin"))
+              .collect(Collectors.toList());
     }
 
     public Optional<User> getJournalEntryById(ObjectId id){
