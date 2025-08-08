@@ -3,6 +3,7 @@ package com.abdus.journalapp.service;
 
 import com.abdus.journalapp.entity.User;
 import com.abdus.journalapp.repository.UserRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -17,6 +18,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Component
+@Slf4j
 public class UserService {
 
     @Autowired
@@ -44,9 +46,13 @@ public class UserService {
 
     //only user role is allotted
     public void saveNewUser(User user){
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        user.setRoles(Arrays.asList("USER"));
-        userRepository.save(user);
+        try {
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
+            user.setRoles(List.of("USER"));
+            userRepository.save(user);
+        }catch (Exception e){
+            log.error("Got an exception: with userName  {} and error is {} ",user.getUserName(),e.getMessage());
+        }
     }
 
     public List<User>getAlldata(){

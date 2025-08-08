@@ -3,10 +3,13 @@ package com.abdus.journalapp.controller;
 
 import com.abdus.journalapp.entity.JournalEntry;
 import com.abdus.journalapp.entity.User;
+import com.abdus.journalapp.entity.weather.WeatherResponse;
 import com.abdus.journalapp.service.JournalEntryService;
 import com.abdus.journalapp.service.UserService;
+import com.abdus.journalapp.service.WeatherService;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -22,6 +25,9 @@ public class UserController {
     private UserService userService;
 
     @Autowired
+    private WeatherService weatherService;
+
+    @Autowired
     private JournalEntryService journalEntryService;
 
     @GetMapping
@@ -33,7 +39,17 @@ public class UserController {
         return ResponseEntity.ok(data);
     }
 
+    @GetMapping("/w/{city}")
+    public ResponseEntity<?> getUserByCity(@PathVariable String city){
 
+        try{
+            WeatherResponse weatherResponse = weatherService.ApiCall(city);
+            return ResponseEntity.ok(weatherResponse);
+        }catch (Exception e){
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 
     @PutMapping
     public ResponseEntity<?> updateUser(@RequestBody User user){
@@ -47,7 +63,8 @@ public class UserController {
             userService.saveNewUser(userInDb);
             return ResponseEntity.ok().build();
         }catch(Exception e){
-            return ResponseEntity.badRequest().body("Exception"+e);
+
+            return ResponseEntity.badRequest().body("Exception-----"+e);
         }
 
     }

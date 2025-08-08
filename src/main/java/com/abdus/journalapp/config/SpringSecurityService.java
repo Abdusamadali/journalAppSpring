@@ -18,9 +18,7 @@ import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity
-@Profile("dev")
-// Optional: allows use of @PreAuthorize, etc.
+@EnableMethodSecurity // Optional: allows use of @PreAuthorize, etc.
 public class SpringSecurityService {
 
     @Autowired
